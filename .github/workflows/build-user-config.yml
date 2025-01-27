@@ -8,11 +8,6 @@ on:
         default: "build.yaml"
         required: false
         type: string
-      config_path:
-        description: "Path to the config directory"
-        default: "config"
-        required: false
-        type: string
       fallback_binary:
         description: "Fallback binary format, if no *.uf2 file was built"
         default: "bin"
@@ -89,8 +84,8 @@ jobs:
       - name: Copy config files to isolated temporary directory
         run: |
           if [ "${{ env.base_dir }}" != "${GITHUB_WORKSPACE}" ]; then
-            mkdir "${{ env.base_dir }}/${{ inputs.config_path }}"
-            cp -R ${{ inputs.config_path }}/* "${{ env.base_dir }}/${{ inputs.config_path }}/"
+            mkdir "${{ env.base_dir }}/${{ matrix.config-path }}"
+            cp -R ${{ matrix.config-path }}/* "${{ env.base_dir }}/${{ matrix.config-path }}/"
           fi
 
       - name: Cache west modules
@@ -113,7 +108,7 @@ jobs:
 
       - name: West Init
         working-directory: ${{ env.base_dir }}
-        run: west init -l "${{ env.base_dir }}/${{ inputs.config_path }}"
+        run: west init -l "${{ env.base_dir }}/${{ matrix.config-path }}"
 
       - name: West Update
         working-directory: ${{ env.base_dir }}
@@ -126,7 +121,7 @@ jobs:
       - name: West Build (${{ env.display_name }})
         working-directory: ${{ env.base_dir }}
         shell: sh -x {0}
-        run: west build -s zmk/app -d "${{ env.build_dir }}" -b "${{ matrix.board }}" ${{ env.extra_west_args }} -- -DZMK_CONFIG=${{ env.base_dir }}/${{ inputs.config_path }} ${{ env.extra_cmake_args }} ${{ matrix.cmake-args }}
+        run: west build -s zmk/app -d "${{ env.build_dir }}" -b "${{ matrix.board }}" ${{ env.extra_west_args }} -- -DZMK_CONFIG=${{ env.base_dir }}/${{ matrix.config-path }} ${{ env.extra_cmake_args }} ${{ matrix.cmake-args }}
 
       - name: ${{ env.display_name }} Kconfig file
         run: |
