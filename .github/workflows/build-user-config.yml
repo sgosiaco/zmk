@@ -34,8 +34,8 @@ jobs:
 
       - name: Fetch Build Matrix
         run: |
-          echo "build_matrix=$(yaml2json '${{ inputs.build_matrix_path }}' | jq -c .)" >> $GITHUB_ENV
-          yaml2json "${{ inputs.build_matrix_path }}" | jq
+          echo "build_matrix=$(yaml2json '${{ inputs.build_matrix_path }}' | jq -c '{include: .include}')" >> $GITHUB_ENV
+          yaml2json "${{ inputs.build_matrix_path }}" | jq "{include: .include}"
 
   build:
     runs-on: ubuntu-latest
